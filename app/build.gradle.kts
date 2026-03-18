@@ -86,6 +86,6 @@ dependencies {
     // Coil for image loading
     implementation("io.coil-kt:coil-compose:2.5.0")
 
-    // MediaPipe LLM Inference
-    implementation("com.google.mediapipe:tasks-genai:0.10.24")
+    // MediaPipe LLM Inference - Commented out for now
+    // implementation("com.google.mediapipe:tasks-genai:0.10.24")
 }

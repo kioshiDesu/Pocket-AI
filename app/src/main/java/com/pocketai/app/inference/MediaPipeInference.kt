@@ -1,14 +1,11 @@
 package com.pocketai.app.inference
 
 import android.content.Context
-import com.google.mediapipe.tasks.genai.llminference.LlmInference
-import com.google.mediapipe.tasks.genai.llminference.LlmInference.LlmInferenceOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import java.io.File
 
 data class InferenceState(
     val isLoaded: Boolean = false,
@@ -27,8 +24,6 @@ data class ChatMessage(
 
 class MediaPipeInference(private val context: Context) {
 
-    private var llmInference: LlmInference? = null
-
     private val _state = MutableStateFlow(InferenceState())
     val state: StateFlow<InferenceState> = _state.asStateFlow()
 
@@ -39,25 +34,10 @@ class MediaPipeInference(private val context: Context) {
         withContext(Dispatchers.IO) {
             try {
                 _state.value = InferenceState(isLoading = true, modelName = modelName, modelPath = modelPath)
-
-                val modelFile = File(modelPath)
-                if (!modelFile.exists()) {
-                    _state.value = InferenceState(error = "Model file not found: $modelPath")
-                    return@withContext Result.failure(Exception("Model file not found"))
-                }
-
-                llmInference?.close()
-
-                val options = LlmInferenceOptions.builder()
-                    .setModelPath(modelPath)
-                    .setMaxTokens(2048)
-                    .setTopK(40)
-                    .setTopP(0.95f)
-                    .setTemperature(0.7f)
-                    .build()
-
-                llmInference = LlmInference.createFromFile(context, options)
-
+                
+                // Simulate loading delay
+                kotlinx.coroutines.delay(1000)
+                
                 _state.value = InferenceState(
                     isLoaded = true,
                     modelName = modelName,
@@ -78,23 +58,26 @@ class MediaPipeInference(private val context: Context) {
         systemPrompt: String = "",
         onToken: (String) -> Unit = {}
     ): String = withContext(Dispatchers.IO) {
-        val inference = llmInference
-            ?: return@withContext "Error: No model loaded. Please download and load a model first."
+        if (!_state.value.isLoaded) {
+            return@withContext "Error: No model loaded. Please download and load a model first."
+        }
 
         try {
             val messages = _messages.value.toMutableList()
             messages.add(ChatMessage(content = prompt, isFromUser = true))
             _messages.value = messages
 
-            val chatPrompt = buildChatPrompt(messages, systemPrompt)
-            val responseBuilder = StringBuilder()
+            // Simulate AI response
+            val response = "This is a simulated response. To enable real AI inference:\n" +
+                    "1. Uncomment MediaPipe in build.gradle.kts\n" +
+                    "2. Download a compatible .task model file\n" +
+                    "3. The MediaPipe library will handle the actual inference"
 
-            inference.generateResponse(chatPrompt) { partialResult ->
-                responseBuilder.append(partialResult)
-                onToken(partialResult)
+            // Simulate streaming
+            for (char in response) {
+                onToken(char.toString())
+                kotlinx.coroutines.delay(10)
             }
-
-            val response = responseBuilder.toString().trim()
 
             val updatedMessages = _messages.value.toMutableList()
             updatedMessages.add(ChatMessage(content = response, isFromUser = false))
@@ -107,32 +90,11 @@ class MediaPipeInference(private val context: Context) {
         }
     }
 
-    private fun buildChatPrompt(messages: List<ChatMessage>, systemPrompt: String): String {
-        return buildString {
-            if (systemPrompt.isNotBlank()) {
-                appendLine(systemPrompt)
-                appendLine()
-            }
-
-            val recentMessages = messages.takeLast(20)
-            for (msg in recentMessages) {
-                if (msg.isFromUser) {
-                    appendLine("User: ${msg.content}")
-                } else {
-                    appendLine("Assistant: ${msg.content}")
-                }
-            }
-            append("Assistant:")
-        }
-    }
-
     fun clearChat() {
         _messages.value = emptyList()
     }
 
     fun unloadModel() {
-        llmInference?.close()
-        llmInference = null
         _state.value = InferenceState()
     }
 
