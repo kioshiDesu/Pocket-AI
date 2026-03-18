@@ -29,12 +29,15 @@ class HomeViewModel @Inject constructor(
 
     val modelState: StateFlow<ModelState> = llmInferenceEngine.modelState
 
-    fun createConversation(title: String = "New Conversation"): Long {
-        var newId = 0L
+    fun createConversation(title: String = "New Conversation", onCreated: (Long) -> Unit) {
         viewModelScope.launch {
-            newId = chatRepository.createConversation(title)
+            val newId = chatRepository.createConversation(title)
+            onCreated(newId)
         }
-        return newId
+    }
+
+    suspend fun createConversationSync(title: String = "New Conversation"): Long {
+        return chatRepository.createConversation(title)
     }
 
     fun deleteConversation(conversationId: Long) {

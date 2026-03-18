@@ -83,7 +83,7 @@ fun HomeScreen(
             FloatingActionButton(
                 onClick = {
                     scope.launch {
-                        val newId = viewModel.createConversation()
+                        val newId = viewModel.createConversationSync()
                         onNavigateToChat(newId)
                     }
                 },
