@@ -23,10 +23,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AI
+import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -88,7 +88,7 @@ fun ChatScreen(
                 title = { Text("Chat") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -127,7 +127,7 @@ fun ChatScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Icon(
-                                    Icons.Default.AI,
+                                    Icons.Default.SmartToy,
                                     contentDescription = null,
                                     modifier = Modifier.size(64.dp),
                                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
@@ -216,7 +216,7 @@ fun ChatScreen(
                         enabled = userInput.isNotBlank() && !uiState.isLoading
                     ) {
                         Icon(
-                            Icons.AutoMirrored.Filled.Send,
+                            Icons.Default.Send,
                             contentDescription = "Send",
                             tint = if (userInput.isNotBlank() && !uiState.isLoading)
                                 MaterialTheme.colorScheme.primary
@@ -258,7 +258,7 @@ fun MessageBubble(message: Message) {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        if (isUser) Icons.Default.Person else Icons.Default.AI,
+                        if (isUser) Icons.Default.Person else Icons.Default.SmartToy,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                         tint = if (isUser) MaterialTheme.colorScheme.onPrimary
