@@ -77,7 +77,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.6")
 
     // MediaPipe LLM Inference
-    implementation("com.google.mediapipe:tasks-genai:0.10.27")
+    implementation("com.google.mediapipe:tasks-genai:0.10.32")
 
     // Room Database
     implementation("androidx.room:room-runtime:2.6.1")
