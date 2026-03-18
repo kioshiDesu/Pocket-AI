@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "PocketAI"
-include ':app'
+include(":app")
