@@ -4,8 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -66,7 +64,7 @@ import com.pocketai.app.data.model.ModelFilter
 import com.pocketai.app.data.model.ModelSort
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModelBrowserScreen(
     onNavigateBack: () -> Unit,
@@ -370,7 +368,7 @@ fun ModelCard(
 
             if (model.tags.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     model.tags.take(5).forEach { tag ->
                         Surface(
                             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -457,7 +455,7 @@ fun DownloadProgressBar(progress: DownloadProgress) {
             }
             Spacer(modifier = Modifier.height(4.dp))
             LinearProgressIndicator(
-                progress = { progress.progress },
+                progress = progress.progress,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(4.dp))
