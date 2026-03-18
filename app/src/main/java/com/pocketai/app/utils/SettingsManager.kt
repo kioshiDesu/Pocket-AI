@@ -1,15 +1,15 @@
 package com.pocketai.app.utils
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "pocketai_settings")
+private val Context.dataStore by preferencesDataStore(name = "pocketai_settings")
 
 class SettingsManager(private val context: Context) {
 
@@ -36,28 +36,40 @@ class SettingsManager(private val context: Context) {
         prefs[LAST_MODEL_NAME] ?: ""
     }
 
-    suspend fun saveHfAuthToken(token: String) {
-        context.dataStore.edit { prefs ->
-            prefs[HF_AUTH_TOKEN] = token
+    fun saveHfAuthToken(token: String) {
+        runBlocking {
+            context.dataStore.edit { prefs ->
+                prefs[HF_AUTH_TOKEN] = token
+            }
         }
     }
 
-    suspend fun saveSystemPrompt(prompt: String) {
-        context.dataStore.edit { prefs ->
-            prefs[SYSTEM_PROMPT] = prompt
+    fun saveSystemPrompt(prompt: String) {
+        runBlocking {
+            context.dataStore.edit { prefs ->
+                prefs[SYSTEM_PROMPT] = prompt
+            }
         }
     }
 
-    suspend fun saveLastModel(path: String, name: String) {
-        context.dataStore.edit { prefs ->
-            prefs[LAST_MODEL_PATH] = path
-            prefs[LAST_MODEL_NAME] = name
+    fun saveLastModel(path: String, name: String) {
+        runBlocking {
+            context.dataStore.edit { prefs ->
+                prefs[LAST_MODEL_PATH] = path
+                prefs[LAST_MODEL_NAME] = name
+            }
         }
     }
 
-    suspend fun clearAuthToken() {
-        context.dataStore.edit { prefs ->
-            prefs.remove(HF_AUTH_TOKEN)
+    fun getHfAuthTokenSync(): String {
+        return runBlocking {
+            hfAuthToken.first()
+        }
+    }
+
+    fun getSystemPromptSync(): String {
+        return runBlocking {
+            systemPrompt.first()
         }
     }
 }

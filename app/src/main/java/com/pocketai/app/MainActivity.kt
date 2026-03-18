@@ -8,19 +8,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.pocketai.app.ui.screens.ChatScreen
 import com.pocketai.app.ui.screens.HuggingFaceAuthScreen
 import com.pocketai.app.ui.screens.HomeScreen
 import com.pocketai.app.ui.screens.ModelBrowserScreen
 import com.pocketai.app.ui.screens.SettingsScreen
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,9 +39,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppNavigation(
-    navController: NavHostController = rememberNavController()
-) {
+fun AppNavigation() {
+    val navController = rememberNavController()
+    val context = LocalContext.current
+    val app = context.applicationContext as PocketAIApp
+    val scope = rememberCoroutineScope()
+
     NavHost(
         navController = navController,
         startDestination = "home"
@@ -66,11 +68,12 @@ fun AppNavigation(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToAuth = { navController.navigate("auth") },
                 onModelDownloaded = { filePath, modelName ->
-                    val app = navController.context.applicationContext as PocketAIApp
-                    runBlocking {
-                        app.settingsManager.saveLastModel(filePath, modelName)
+                    scope.launch {
+                        app.inferenceEngine.loadModel(filePath, modelName)
                     }
-                    app.inferenceEngine.loadModel(filePath, modelName)
+                    navController.navigate("chat") {
+                        popUpTo("home")
+                    }
                 }
             )
         }
@@ -79,10 +82,7 @@ fun AppNavigation(
             HuggingFaceAuthScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onTokenExtracted = { token ->
-                    val app = navController.context.applicationContext as PocketAIApp
-                    runBlocking {
-                        app.settingsManager.saveHfAuthToken(token)
-                    }
+                    app.settingsManager.saveHfAuthToken(token)
                 }
             )
         }

@@ -25,13 +25,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.pocketai.app.PocketAIApp
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +38,6 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val app = context.applicationContext as PocketAIApp
-    val scope = rememberCoroutineScope()
 
     val inferenceState by app.inferenceEngine.state.collectAsState()
     val savedSystemPrompt by app.settingsManager.systemPrompt.collectAsState(initial = "You are a helpful AI assistant.")
@@ -133,9 +130,7 @@ fun SettingsScreen(
 
             Button(
                 onClick = {
-                    scope.launch {
-                        app.settingsManager.saveHfAuthToken(authToken)
-                    }
+                    app.settingsManager.saveHfAuthToken(authToken)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -163,9 +158,7 @@ fun SettingsScreen(
 
             Button(
                 onClick = {
-                    scope.launch {
-                        app.settingsManager.saveSystemPrompt(systemPrompt)
-                    }
+                    app.settingsManager.saveSystemPrompt(systemPrompt)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
