@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -76,8 +77,11 @@ dependencies {
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.6")
 
-    // MediaPipe LLM Inference
-    implementation("com.google.mediapipe:tasks-genai:0.10.32")
+    // DocumentFile for SAF
+    implementation("androidx.documentfile:documentfile:1.0.1")
+
+    // MediaPipe LLM Inference (uncomment when building on physical device)
+    // implementation("com.google.mediapipe:tasks-genai:0.10.32")
 
     // Room Database
     implementation("androidx.room:room-runtime:2.6.1")

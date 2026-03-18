@@ -12,7 +12,6 @@ on:
 env:
   JAVA_VERSION: '17'
   ANDROID_COMPILE_SDK: 34
-  ANDROID_BUILD_TOOLS: 34.0.0
 
 jobs:
   build:
@@ -30,6 +29,11 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
+        with:
+          packages: 'platforms;android-34,build-tools;34.0.0,platform-tools'
+
+      - name: Remove local.properties
+        run: rm -f local.properties
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -59,6 +63,11 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
+        with:
+          packages: 'platforms;android-34,build-tools;34.0.0,platform-tools'
+
+      - name: Remove local.properties
+        run: rm -f local.properties
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
