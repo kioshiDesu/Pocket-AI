@@ -26,7 +26,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,7 +44,7 @@ fun SettingsScreen(
     val modelState by viewModel.modelState.collectAsState()
     val modelConfig by viewModel.modelConfig.collectAsState()
 
-    var temperature by remember { mutableFloatStateOf(modelConfig?.temperature ?: 0.7f) }
+    var temperature by remember { mutableStateOf(modelConfig?.temperature ?: 0.7f) }
     var maxTokens by remember { mutableStateOf(modelConfig?.maxTokens?.toString() ?: "1024") }
     var systemPrompt by remember { mutableStateOf(modelConfig?.systemPrompt ?: "You are a helpful AI assistant.") }
 
