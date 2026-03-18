@@ -56,7 +56,7 @@ class MediaPipeInference(private val context: Context) {
                     .setTemperature(0.7f)
                     .build()
 
-                llmInference = LlmInference.createFromOptions(context, options)
+                llmInference = LlmInference.createFromFile(context, options)
 
                 _state.value = InferenceState(
                     isLoaded = true,
