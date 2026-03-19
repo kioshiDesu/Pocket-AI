@@ -1,6 +1,9 @@
 package com.pocketai.app
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,11 +23,17 @@ import com.pocketai.app.ui.screens.HomeScreen
 import com.pocketai.app.ui.screens.ModelBrowserScreen
 import com.pocketai.app.ui.screens.SettingsScreen
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Handle incoming intent for model files
+        handleIncomingIntent(intent)
+        
         setContent {
             MaterialTheme {
                 Surface(
@@ -34,6 +43,74 @@ class MainActivity : ComponentActivity() {
                     AppNavigation()
                 }
             }
+        }
+    }
+    
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.let { handleIncomingIntent(it) }
+    }
+    
+    private fun handleIncomingIntent(intent: Intent) {
+        val action = intent.action
+        val type = intent.type
+        
+        if (Intent.ACTION_VIEW == action && type != null) {
+            val uri = intent.data
+            if (uri != null) {
+                // Copy the file to app's model directory and load it
+                copyAndLoadModel(uri)
+            }
+        }
+    }
+    
+    private fun copyAndLoadModel(uri: Uri) {
+        val app = application as PocketAIApp
+        
+        try {
+            // Get file name from URI
+            val fileName = getFileName(uri) ?: "imported_model.task"
+            
+            // Copy file to models directory
+            val modelsDir = File(getExternalFilesDir(null), "models")
+            if (!modelsDir.exists()) modelsDir.mkdirs()
+            
+            val outputFile = File(modelsDir, fileName)
+            contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(outputFile).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            
+            // Load the model
+            val scope = rememberCoroutineScope()
+            scope.launch {
+                app.inferenceEngine.loadModel(outputFile.absolutePath, fileName)
+            }
+            
+            Toast.makeText(this, "Model imported successfully: $fileName", Toast.LENGTH_LONG).show()
+            
+        } catch (e: Exception) {
+            Toast.makeText(this, "Failed to import model: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+    
+    private fun getFileName(uri: Uri): String? {
+        return when (uri.scheme) {
+            "content" -> {
+                val cursor = contentResolver.query(uri, null, null, null, null)
+                cursor?.use {
+                    val nameIndex = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                    if (nameIndex >= 0 && it.moveToFirst()) {
+                        return it.getString(nameIndex)
+                    }
+                }
+                null
+            }
+            "file" -> {
+                uri.lastPathSegment
+            }
+            else -> null
         }
     }
 }

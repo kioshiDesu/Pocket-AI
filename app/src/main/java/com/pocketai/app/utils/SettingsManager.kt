@@ -18,6 +18,9 @@ class SettingsManager(private val context: Context) {
         private val SYSTEM_PROMPT = stringPreferencesKey("system_prompt")
         private val LAST_MODEL_PATH = stringPreferencesKey("last_model_path")
         private val LAST_MODEL_NAME = stringPreferencesKey("last_model_name")
+        private val OPENROUTER_API_KEY = stringPreferencesKey("openrouter_api_key")
+        private val OLLAMA_HOST = stringPreferencesKey("ollama_host")
+        private val AI_PROVIDER = stringPreferencesKey("ai_provider")
     }
 
     val hfAuthToken: Flow<String> = context.dataStore.data.map { prefs ->
@@ -34,6 +37,18 @@ class SettingsManager(private val context: Context) {
 
     val lastModelName: Flow<String> = context.dataStore.data.map { prefs ->
         prefs[LAST_MODEL_NAME] ?: ""
+    }
+
+    val openRouterApiKey: Flow<String> = context.dataStore.data.map { prefs ->
+        prefs[OPENROUTER_API_KEY] ?: ""
+    }
+
+    val ollamaHost: Flow<String> = context.dataStore.data.map { prefs ->
+        prefs[OLLAMA_HOST] ?: "http://localhost:11434"
+    }
+
+    val aiProvider: Flow<String> = context.dataStore.data.map { prefs ->
+        prefs[AI_PROVIDER] ?: "offline"
     }
 
     fun saveHfAuthToken(token: String) {
@@ -61,6 +76,30 @@ class SettingsManager(private val context: Context) {
         }
     }
 
+    fun saveOpenRouterApiKey(key: String) {
+        runBlocking {
+            context.dataStore.edit { prefs ->
+                prefs[OPENROUTER_API_KEY] = key
+            }
+        }
+    }
+
+    fun saveOllamaHost(host: String) {
+        runBlocking {
+            context.dataStore.edit { prefs ->
+                prefs[OLLAMA_HOST] = host
+            }
+        }
+    }
+
+    fun saveAiProvider(provider: String) {
+        runBlocking {
+            context.dataStore.edit { prefs ->
+                prefs[AI_PROVIDER] = provider
+            }
+        }
+    }
+
     fun getHfAuthTokenSync(): String {
         return runBlocking {
             hfAuthToken.first()
@@ -70,6 +109,24 @@ class SettingsManager(private val context: Context) {
     fun getSystemPromptSync(): String {
         return runBlocking {
             systemPrompt.first()
+        }
+    }
+
+    fun getOpenRouterApiKeySync(): String {
+        return runBlocking {
+            openRouterApiKey.first()
+        }
+    }
+
+    fun getOllamaHostSync(): String {
+        return runBlocking {
+            ollamaHost.first()
+        }
+    }
+
+    fun getAiProviderSync(): String {
+        return runBlocking {
+            aiProvider.first()
         }
     }
 }

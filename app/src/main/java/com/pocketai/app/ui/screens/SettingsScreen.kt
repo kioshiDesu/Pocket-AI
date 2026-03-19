@@ -42,9 +42,15 @@ fun SettingsScreen(
     val inferenceState by app.inferenceEngine.state.collectAsState()
     val savedSystemPrompt by app.settingsManager.systemPrompt.collectAsState(initial = "You are a helpful AI assistant.")
     val savedAuthToken by app.settingsManager.hfAuthToken.collectAsState(initial = "")
+    val savedOpenRouterKey by app.settingsManager.openRouterApiKey.collectAsState(initial = "")
+    val savedOllamaHost by app.settingsManager.ollamaHost.collectAsState(initial = "http://localhost:11434")
+    val savedAiProvider by app.settingsManager.aiProvider.collectAsState(initial = "offline")
 
     var systemPrompt by remember { mutableStateOf(savedSystemPrompt) }
     var authToken by remember { mutableStateOf(savedAuthToken) }
+    var openRouterKey by remember { mutableStateOf(savedOpenRouterKey) }
+    var ollamaHost by remember { mutableStateOf(savedOllamaHost) }
+    var aiProvider by remember { mutableStateOf(savedAiProvider) }
 
     Scaffold(
         topBar = {
@@ -100,6 +106,109 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "AI Provider",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = aiProvider,
+                onValueChange = { aiProvider = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("offline, openrouter, ollama") },
+                singleLine = true
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Options: 'offline' (local), 'openrouter' (online), 'ollama' (local)",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    app.settingsManager.saveAiProvider(aiProvider)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Save Provider")
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "OpenRouter API (Online)",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "OpenRouter API Key (for online AI models)",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = openRouterKey,
+                onValueChange = { openRouterKey = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("sk-or-v1-...") },
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    app.settingsManager.saveOpenRouterApiKey(openRouterKey)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Save OpenRouter Key")
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Ollama (Local via Termux)",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Ollama Host URL",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = ollamaHost,
+                onValueChange = { ollamaHost = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("http://localhost:11434") },
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    app.settingsManager.saveOllamaHost(ollamaHost)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Save Ollama Host")
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -178,12 +287,12 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Powered by MediaPipe and HuggingFace",
+                text = "Supports: Offline (MediaPipe), OpenRouter, Ollama",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "All processing happens locally on your device",
+                text = "All local processing happens on your device",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
